@@ -11,6 +11,7 @@ class SignupScreen extends StatefulWidget {
 class SignupScreenState extends State<SignupScreen> {
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
+  TextEditingController nameController = TextEditingController();
 
   @override
   void initState() {
@@ -32,13 +33,20 @@ class SignupScreenState extends State<SignupScreen> {
               decoration: InputDecoration(label: Text("Correo electronico")),
             ),
             TextField(
+              controller: nameController,
+              decoration: InputDecoration(label: Text("Nombre")),
+            ),
+            TextField(
               controller: passwordController,
               decoration: InputDecoration(label: Text("Constraseña")),
               obscureText: true,
             ),
             ElevatedButton(
-              onPressed: () =>
-                  _signup(emailController.text, passwordController.text),
+              onPressed: () => _signup(
+                emailController.text,
+                nameController.text,
+                passwordController.text,
+              ),
               child: Text("Registrarse"),
             ),
           ],
@@ -47,12 +55,22 @@ class SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Future<void> _signup(String email, String pass) async {
+  Future<void> _signup(String email, String name, String pass) async {
     try {
       AuthResponse response = await Supabase.instance.client.auth.signUp(
         email: email,
         password: pass,
       );
+      await Supabase.instance.client.from("profiles").insert({
+        "id": response.user?.id,
+        "name": name,
+        "email": email,
+      });
+      await Supabase.instance.client.from("posts").insert({
+        "title": "Mi Titulo",
+        "content": "Alfa beta gamma",
+      });
+
       print(response);
     } on AuthException catch (e) {
       print(e);

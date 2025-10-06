@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:moviles252/ui/screens/my_profile_page.dart';
+import 'package:moviles252/ui/screens/post_page.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class ProfileScreen extends StatefulWidget {
@@ -9,31 +11,30 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class ProfileScreenState extends State<ProfileScreen> {
-  @override
-  void initState() {
-    super.initState();
-    print("****");
-    print(Supabase.instance.client.auth.currentUser);
-  }
+  int _currentIndex = 0;
+
+  static List<Widget> _pages = [MyProfilePage(), PostPage()];
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            ElevatedButton(
-              onPressed: () => _signout(),
-              child: Text("Cerrar Sesion"),
-            ),
-          ],
-        ),
+      body: SafeArea(child: currentPage()),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+          BottomNavigationBarItem(icon: Icon(Icons.public), label: "Post"),
+        ],
+        currentIndex: _currentIndex,
+        onTap: (value) {
+          setState(() {
+            _currentIndex = value;
+          });
+        },
       ),
     );
   }
 
-  Future<void> _signout() async {
-    await Supabase.instance.client.auth.signOut();
-    Navigator.pushReplacementNamed(context, '/login');
+  Widget currentPage() {
+    return _pages[_currentIndex];
   }
 }

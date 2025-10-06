@@ -1,8 +1,8 @@
 class Profile {
-  final String id; // UID de Supabase Auth
-  final String name;
-  final String email;
-  final DateTime createdAt;
+  String id;
+  String name;
+  String email;
+  DateTime createdAt;
 
   Profile({
     required this.id,

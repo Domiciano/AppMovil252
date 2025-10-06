@@ -27,6 +27,7 @@ class LoginScreenState extends State<LoginScreen> {
       );
       print("****");
       print(Supabase.instance.client.auth.currentUser);
+      Navigator.pushReplacementNamed(context, '/profile');
     } on AuthException catch (e) {
       print(e);
     } catch (e) {
@@ -53,6 +54,11 @@ class LoginScreenState extends State<LoginScreen> {
               onPressed: () =>
                   _login(emailController.text, passwordController.text),
               child: Text("Iniciar Sesion"),
+            ),
+            SizedBox(height: 32),
+            GestureDetector(
+              onTap: () => {Navigator.pushReplacementNamed(context, '/signup')},
+              child: Text("No tengo cuenta"),
             ),
           ],
         ),

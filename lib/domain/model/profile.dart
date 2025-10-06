@@ -1,5 +1,5 @@
 class Profile {
-  final String id; // UID de Supabase Auth
+  String id; // UID de Supabase Auth
   final String name;
   final String email;
   final DateTime createdAt;

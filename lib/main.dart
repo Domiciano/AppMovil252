@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moviles252/features/auth/ui/bloc/signup_bloc.dart';
 import 'package:moviles252/ui/screens/login_screen.dart';
 import 'package:moviles252/ui/screens/profile_screen.dart';
-import 'package:moviles252/ui/screens/signup_screen.dart';
+import 'package:moviles252/features/auth/ui/screens/signup_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -28,7 +30,8 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: '/signup',
       routes: {
-        '/signup': (_) => SignupScreen(),
+        '/signup': (_) =>
+            BlocProvider(create: (_) => SignupBloc(), child: SignupScreen()),
         '/login': (_) => LoginScreen(),
         '/profile': (_) => ProfileScreen(),
       },

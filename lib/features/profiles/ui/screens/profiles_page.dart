@@ -11,36 +11,33 @@ class ProfilesPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ProfilesListBloc(),
-      child: BlocBuilder<ProfilesListBloc, ProfilesListState>(
-        builder: (context, state) {
-          if (state is ProfilesListLoadingState) {
-            return CircularProgressIndicator();
-          } else if (state is ProfilesListErrorState) {
-            return Text('Error al cargar perfiles');
-          } else if (state is ProfilesListLoadedState) {
-            return ListView.builder(
-              padding: const EdgeInsets.all(16),
-              itemCount: state.profiles.length,
-              itemBuilder: (context, index) {
-                final profile = state.profiles[index];
-                return ProfileCard(
-                  profile: profile,
-                  onTap: () {
-                    Navigator.pushNamed(
-                      context,
-                      '/chat',
-                      arguments: {"otherUser": profile},
-                    );
-                  },
-                );
-              },
-            );
-          }
-          return const SizedBox.shrink();
-        },
-      ),
+    return BlocBuilder<ProfilesListBloc, ProfilesListState>(
+      builder: (context, state) {
+        if (state is ProfilesListLoadingState) {
+          return CircularProgressIndicator();
+        } else if (state is ProfilesListErrorState) {
+          return Text('Error al cargar perfiles');
+        } else if (state is ProfilesListLoadedState) {
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: state.profiles.length,
+            itemBuilder: (context, index) {
+              final profile = state.profiles[index];
+              return ProfileCard(
+                profile: profile,
+                onTap: () {
+                  Navigator.pushNamed(
+                    context,
+                    '/chat',
+                    arguments: {"otherUser": profile},
+                  );
+                },
+              );
+            },
+          );
+        }
+        return const SizedBox.shrink();
+      },
     );
   }
 }

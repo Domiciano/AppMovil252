@@ -5,7 +5,7 @@ import 'package:moviles252/features/chat/domain/repository/message_repository.da
 class SendMessageUseCase {
   final MessageRepository _repository = MessageRepositoryImpl();
 
-  Future<Message> call(
+  Future<Message> execute(
     String conversationId,
     String senderId,
     String content,

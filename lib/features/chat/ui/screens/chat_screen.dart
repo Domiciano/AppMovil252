@@ -29,11 +29,9 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void _sendMessage() {
     final content = _messageController.text.trim();
-    if (content.isNotEmpty) {
-      context.read<ChatBloc>().add(SendMessageEvent(content: content));
-      _messageController.clear();
-      _scrollToBottom();
-    }
+    context.read<ChatBloc>().add(SendMessageEvent(content: content));
+    _messageController.clear();
+    _scrollToBottom();
   }
 
   void _scrollToBottom() {

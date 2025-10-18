@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:moviles252/features/chat/domain/model/message.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -44,5 +46,33 @@ class MessageDataSourceImpl extends MessageDataSource {
         .order('created_at', ascending: true);
 
     return (response as List).map((json) => Message.fromJson(json)).toList();
+  }
+
+  Stream<Message> listenMessagesByConversation(String conversationId) async* {
+    print("Listening messages ...");
+    final controller = StreamController<Message>();
+
+    var messages = await getMessagesByConversation(conversationId);
+    for (var m in messages) {
+      print(m);
+      yield m;
+    }
+
+    final channel = Supabase.instance.client
+        .channel('public:messages')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'messages',
+          callback: (payload) {
+            controller.add(Message.fromJson(payload.newRecord));
+            print(payload.newRecord);
+          },
+        )
+        .subscribe();
+    controller.onCancel = () {
+      Supabase.instance.client.removeChannel(channel);
+    };
+    yield* controller.stream;
   }
 }

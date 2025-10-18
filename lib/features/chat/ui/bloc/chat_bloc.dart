@@ -1,11 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moviles252/domain/model/profile.dart';
+import 'package:moviles252/features/chat/data/source/message_data_source.dart';
 import 'package:moviles252/features/chat/domain/model/message.dart';
 import 'package:moviles252/features/chat/domain/model/conversation.dart';
 import 'package:moviles252/features/auth/domain/usecases/who_am_i_usecase.dart';
 import 'package:moviles252/features/chat/domain/usecases/find_or_create_conversation_usecase.dart';
-import 'package:moviles252/features/chat/domain/usecases/send_message_usecase.dart';
 import 'package:moviles252/features/chat/domain/usecases/get_messages_usecase.dart';
+import 'package:moviles252/features/chat/domain/usecases/send_message_usecase.dart';
 import 'package:moviles252/features/profiles/data/repository/profiles_repository_impl.dart';
 import 'package:moviles252/features/profiles/domain/repository/profiles_repository.dart';
 
@@ -20,6 +21,11 @@ class InitializeChatEvent extends ChatEvent {
 class SendMessageEvent extends ChatEvent {
   final String content;
   SendMessageEvent({required this.content});
+}
+
+class ChatNewMessageArriveEvent extends ChatEvent {
+  final Message message;
+  ChatNewMessageArriveEvent({required this.message});
 }
 
 // States
@@ -53,8 +59,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   final FindOrCreateConversationUseCase _findOrCreateConversationUseCase =
       FindOrCreateConversationUseCase();
   final GetMessagesUseCase _getMessagesUseCase = GetMessagesUseCase();
+  final SendMessageUseCase sendMessageUseCase = SendMessageUseCase();
 
   final ProfilesRepository repository = ProfilesRepositoryImpl();
+
+  final MessageDataSourceImpl source = MessageDataSourceImpl();
 
   ChatBloc() : super(ChatInitialState()) {
     on<InitializeChatEvent>(_onInitializeChat);
@@ -69,6 +78,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     try {
       // Obtener usuario actual
       final currentUser = await _whoAmIUseCase();
+
       // Obtener otro usuario actual
       final otherUser = await repository.getProfileById(event.otherUser.id);
 
@@ -95,10 +105,22 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
           currentUser: currentUser,
         ),
       );
+      source.listenMessagesByConversation(conversation.id).listen((msg) {
+        print(msg.content);
+      });
     } catch (e) {
       emit(ChatErrorState(message: 'Error al cargar el chat: $e'));
     }
   }
 
-  void _onSendMessage(SendMessageEvent event, Emitter<ChatState> emit) async {}
+  void _onSendMessage(SendMessageEvent event, Emitter<ChatState> emit) async {
+    if (state is ChatLoadedState) {
+      var loadedState = state as ChatLoadedState;
+      sendMessageUseCase.execute(
+        loadedState.conversation.id,
+        loadedState.currentUser.id,
+        event.content,
+      );
+    }
+  }
 }

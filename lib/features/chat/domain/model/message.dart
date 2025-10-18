@@ -15,7 +15,6 @@ class Message {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
       'conversation_id': conversationId,
       'sender_id': senderId,
       'content': content,

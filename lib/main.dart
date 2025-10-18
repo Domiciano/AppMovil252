@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:moviles252/features/auth/ui/bloc/login_bloc.dart';
 import 'package:moviles252/features/auth/ui/bloc/signup_bloc.dart';
 import 'package:moviles252/ui/screens/login_screen.dart';
 import 'package:moviles252/ui/screens/profile_screen.dart';
@@ -28,11 +29,11 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      initialRoute: '/profile',
+      initialRoute: '/login',
       routes: {
         '/signup': (_) =>
             BlocProvider(create: (_) => SignupBloc(), child: SignupScreen()),
-        '/login': (_) => LoginScreen(),
+        '/login': (_) => BlocProvider(create: (_) => LoginBloc(), child: LoginScreen()),
         '/profile': (_) => ProfileScreen(),
       },
     );

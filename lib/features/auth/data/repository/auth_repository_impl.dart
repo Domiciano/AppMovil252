@@ -17,4 +17,14 @@ class AuthRepositoryImpl extends AuthRepository {
       _profileDataSource.createProfile(profile);
     }
   }
+
+  @override
+  Future<void> loginUser(String email, String password) async {
+    await _authDataSource.signIn(email, password);
+  }
+
+  @override
+  Future<void> logoutUser() async {
+    await _authDataSource.signOut();
+  }
 }

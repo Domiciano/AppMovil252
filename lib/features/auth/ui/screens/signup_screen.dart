@@ -40,6 +40,12 @@ class SignupScreenState extends State<SignupScreen> {
         obscureText: true,
       ),
       submmitButton(),
+      TextButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/login');
+        },
+        child: Text("Ya tienes cuenta? Inicia Sesion"),
+      )
     ],
   );
 

@@ -13,7 +13,7 @@ class ProfileScreen extends StatefulWidget {
 class ProfileScreenState extends State<ProfileScreen> {
   int _currentIndex = 0;
 
-  static List<Widget> _pages = [MyProfilePage(), PostPage()];
+  static final List<Widget> _pages = [MyProfilePage(), PostPage()];
 
   @override
   Widget build(BuildContext context) {

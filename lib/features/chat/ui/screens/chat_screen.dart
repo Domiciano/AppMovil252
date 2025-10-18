@@ -53,7 +53,7 @@ class _ChatScreenState extends State<ChatScreen> {
     // Extraer el usuario de los argumentos de navegación
     final arguments =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    final otherUser = arguments['user'] as Profile;
+    final otherUser = arguments['otherUser'] as Profile;
 
     return Scaffold(
       appBar: AppBar(
@@ -106,7 +106,9 @@ class _ChatScreenState extends State<ChatScreen> {
         builder: (context, state) {
           // Cargar el chat si no está cargado
           if (state is ChatInitialState) {
-            context.read<ChatBloc>().add(LoadChatEvent(otherUser: otherUser));
+            context.read<ChatBloc>().add(
+              InitializeChatEvent(otherUser: otherUser),
+            );
           }
           if (state is ChatLoadingState) {
             return const Center(child: CircularProgressIndicator());
@@ -142,7 +144,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       final message = state.messages[index];
                       return MessageBubble(
                         message: message,
-                        isMe: message.senderId == 'current_user',
+                        isMe: message.senderId == state.currentUser.id,
                       );
                     },
                   ),
@@ -207,7 +209,7 @@ class MessageBubble extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _formatTime(message.timestamp),
+                    _formatTime(message.createdAt),
                     style: TextStyle(
                       color: isMe ? Colors.white70 : Colors.grey[600],
                       fontSize: 12,

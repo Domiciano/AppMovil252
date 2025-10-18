@@ -1,39 +1,35 @@
 class Message {
   final String id;
+  final String conversationId;
   final String senderId;
-  final String receiverId;
   final String content;
-  final DateTime timestamp;
-  final bool isRead;
+  final DateTime createdAt;
 
   Message({
     required this.id,
+    required this.conversationId,
     required this.senderId,
-    required this.receiverId,
     required this.content,
-    required this.timestamp,
-    this.isRead = false,
+    required this.createdAt,
   });
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'conversation_id': conversationId,
       'sender_id': senderId,
-      'receiver_id': receiverId,
       'content': content,
-      'timestamp': timestamp.toIso8601String(),
-      'is_read': isRead,
+      'created_at': createdAt.toIso8601String(),
     };
   }
 
   factory Message.fromJson(Map<String, dynamic> json) {
     return Message(
       id: json['id'] as String,
+      conversationId: json['conversation_id'] as String,
       senderId: json['sender_id'] as String,
-      receiverId: json['receiver_id'] as String,
       content: json['content'] as String,
-      timestamp: DateTime.parse(json['timestamp'] as String),
-      isRead: json['is_read'] as bool? ?? false,
+      createdAt: DateTime.parse(json['created_at'] as String),
     );
   }
 }

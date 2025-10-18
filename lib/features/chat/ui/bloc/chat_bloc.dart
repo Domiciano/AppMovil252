@@ -1,13 +1,20 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moviles252/domain/model/profile.dart';
 import 'package:moviles252/features/chat/domain/model/message.dart';
+import 'package:moviles252/features/chat/domain/model/conversation.dart';
+import 'package:moviles252/features/auth/domain/usecases/who_am_i_usecase.dart';
+import 'package:moviles252/features/chat/domain/usecases/find_or_create_conversation_usecase.dart';
+import 'package:moviles252/features/chat/domain/usecases/send_message_usecase.dart';
+import 'package:moviles252/features/chat/domain/usecases/get_messages_usecase.dart';
+import 'package:moviles252/features/profiles/data/repository/profiles_repository_impl.dart';
+import 'package:moviles252/features/profiles/domain/repository/profiles_repository.dart';
 
 // Events
 abstract class ChatEvent {}
 
-class LoadChatEvent extends ChatEvent {
+class InitializeChatEvent extends ChatEvent {
   final Profile otherUser;
-  LoadChatEvent({required this.otherUser});
+  InitializeChatEvent({required this.otherUser});
 }
 
 class SendMessageEvent extends ChatEvent {
@@ -25,7 +32,14 @@ class ChatLoadingState extends ChatState {}
 class ChatLoadedState extends ChatState {
   final List<Message> messages;
   final Profile otherUser;
-  ChatLoadedState({required this.messages, required this.otherUser});
+  final Conversation conversation;
+  final Profile currentUser;
+  ChatLoadedState({
+    required this.messages,
+    required this.otherUser,
+    required this.conversation,
+    required this.currentUser,
+  });
 }
 
 class ChatErrorState extends ChatState {
@@ -35,93 +49,56 @@ class ChatErrorState extends ChatState {
 
 // Bloc
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
+  final WhoAmIUseCase _whoAmIUseCase = WhoAmIUseCase();
+  final FindOrCreateConversationUseCase _findOrCreateConversationUseCase =
+      FindOrCreateConversationUseCase();
+  final GetMessagesUseCase _getMessagesUseCase = GetMessagesUseCase();
+
+  final ProfilesRepository repository = ProfilesRepositoryImpl();
+
   ChatBloc() : super(ChatInitialState()) {
-    on<LoadChatEvent>(_onLoadChat);
+    on<InitializeChatEvent>(_onInitializeChat);
     on<SendMessageEvent>(_onSendMessage);
   }
 
-  void _onLoadChat(LoadChatEvent event, Emitter<ChatState> emit) async {
+  void _onInitializeChat(
+    InitializeChatEvent event,
+    Emitter<ChatState> emit,
+  ) async {
     emit(ChatLoadingState());
-
     try {
-      // Datos dummy de mensajes para mostrar la funcionalidad
-      final dummyMessages = [
-        Message(
-          id: '1',
-          senderId: 'current_user',
-          receiverId: event.otherUser.id,
-          content: 'Hola! ¿Cómo estás?',
-          timestamp: DateTime.now().subtract(Duration(hours: 2)),
-          isRead: true,
-        ),
-        Message(
-          id: '2',
-          senderId: event.otherUser.id,
-          receiverId: 'current_user',
-          content: '¡Hola! Todo bien, gracias por preguntar. ¿Y tú?',
-          timestamp: DateTime.now().subtract(Duration(hours: 1, minutes: 45)),
-          isRead: true,
-        ),
-        Message(
-          id: '3',
-          senderId: 'current_user',
-          receiverId: event.otherUser.id,
-          content:
-              'Muy bien también, gracias. ¿Qué planes tienes para el fin de semana?',
-          timestamp: DateTime.now().subtract(Duration(hours: 1, minutes: 30)),
-          isRead: true,
-        ),
-        Message(
-          id: '4',
-          senderId: event.otherUser.id,
-          receiverId: 'current_user',
-          content:
-              'Pensaba ir al cine con unos amigos. ¿Te gustaría acompañarnos?',
-          timestamp: DateTime.now().subtract(Duration(minutes: 45)),
-          isRead: true,
-        ),
-        Message(
-          id: '5',
-          senderId: 'current_user',
-          receiverId: event.otherUser.id,
-          content: '¡Me encantaría! ¿A qué película van a ver?',
-          timestamp: DateTime.now().subtract(Duration(minutes: 30)),
-          isRead: false,
-        ),
-      ];
+      // Obtener usuario actual
+      final currentUser = await _whoAmIUseCase();
+      // Obtener otro usuario actual
+      final otherUser = await repository.getProfileById(event.otherUser.id);
 
+      if (currentUser == null) {
+        emit(ChatErrorState(message: 'No se pudo obtener el usuario actual'));
+        return;
+      }
+      if (otherUser == null) {
+        emit(ChatErrorState(message: 'No se pudo obtener el otro usuario'));
+        return;
+      }
+      // Crear la conversación
+      var conversation = await _findOrCreateConversationUseCase.excecute(
+        currentUser.id,
+        event.otherUser.id,
+      );
+      // Cargar Mensajes
+      var messages = await _getMessagesUseCase.execute(conversation.id);
       emit(
-        ChatLoadedState(messages: dummyMessages, otherUser: event.otherUser),
+        ChatLoadedState(
+          messages: messages,
+          otherUser: otherUser,
+          conversation: conversation,
+          currentUser: currentUser,
+        ),
       );
     } catch (e) {
       emit(ChatErrorState(message: 'Error al cargar el chat: $e'));
     }
   }
 
-  void _onSendMessage(SendMessageEvent event, Emitter<ChatState> emit) async {
-    if (state is ChatLoadedState) {
-      final currentState = state as ChatLoadedState;
-
-      // Crear nuevo mensaje
-      final newMessage = Message(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        senderId: 'current_user',
-        receiverId: currentState.otherUser.id,
-        content: event.content,
-        timestamp: DateTime.now(),
-        isRead: false,
-      );
-
-      // Agregar el mensaje a la lista
-      final updatedMessages = List<Message>.from(currentState.messages)
-        ..add(newMessage);
-
-      emit(
-        ChatLoadedState(
-          messages: updatedMessages,
-          otherUser: currentState.otherUser,
-        ),
-      );
-    }
-  }
+  void _onSendMessage(SendMessageEvent event, Emitter<ChatState> emit) async {}
 }

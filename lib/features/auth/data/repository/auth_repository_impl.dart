@@ -1,7 +1,7 @@
 import 'package:moviles252/domain/model/profile.dart';
 import 'package:moviles252/features/auth/data/source/auth_data_source.dart';
 import 'package:moviles252/features/auth/domain/repository/auth_repository.dart';
-import 'package:moviles252/features/profile/data/source/profile_data_source.dart';
+import 'package:moviles252/features/profiles/data/source/profile_data_source.dart';
 
 class AuthRepositoryImpl extends AuthRepository {
   AuthDataSource _authDataSource = AuthDataSourceImpl();
@@ -26,5 +26,19 @@ class AuthRepositoryImpl extends AuthRepository {
   @override
   Future<void> logoutUser() async {
     await _authDataSource.signOut();
+  }
+
+  @override
+  Future<Profile?> getCurrentUser() async {
+    try {
+      final user = await _authDataSource.getCurrentUser();
+      if (user != null) {
+        // Buscar el perfil completo en la base de datos
+        return await _profileDataSource.getProfileById(user.id);
+      }
+      return null;
+    } catch (e) {
+      return null;
+    }
   }
 }

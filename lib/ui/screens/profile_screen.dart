@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:moviles252/features/profiles/ui/screens/profiles_page.dart';
 import 'package:moviles252/ui/screens/my_profile_page.dart';
 import 'package:moviles252/ui/screens/post_page.dart';
-import 'package:moviles252/features/chat/ui/screens/users_list_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -13,7 +13,7 @@ class ProfileScreen extends StatefulWidget {
 class ProfileScreenState extends State<ProfileScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _pages = [MyProfilePage(), PostPage(), UsersListScreen()];
+  final List<Widget> _pages = [MyProfilePage(), PostPage(), ProfilesPage()];
 
   @override
   Widget build(BuildContext context) {

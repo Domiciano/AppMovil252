@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:moviles252/ui/screens/my_profile_page.dart';
 import 'package:moviles252/ui/screens/post_page.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:moviles252/features/chat/ui/screens/users_list_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -13,7 +13,7 @@ class ProfileScreen extends StatefulWidget {
 class ProfileScreenState extends State<ProfileScreen> {
   int _currentIndex = 0;
 
-  static final List<Widget> _pages = [MyProfilePage(), PostPage()];
+  final List<Widget> _pages = [MyProfilePage(), PostPage(), UsersListScreen()];
 
   @override
   Widget build(BuildContext context) {
@@ -23,6 +23,7 @@ class ProfileScreenState extends State<ProfileScreen> {
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
           BottomNavigationBarItem(icon: Icon(Icons.public), label: "Post"),
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: "Chat"),
         ],
         currentIndex: _currentIndex,
         onTap: (value) {

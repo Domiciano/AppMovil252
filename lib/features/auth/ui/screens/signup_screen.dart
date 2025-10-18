@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:moviles252/features/auth/ui/bloc/signup_bloc.dart';
+import 'package:moviles252/features/auth/ui/widgets/signup_content.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -24,65 +23,16 @@ class SignupScreenState extends State<SignupScreen> {
     print(Supabase.instance.client.auth.currentSession);
   }
 
-  Widget content() => Column(
-    children: [
-      TextField(
-        controller: emailController,
-        decoration: InputDecoration(label: Text("Correo electronico")),
-      ),
-      TextField(
-        controller: nameController,
-        decoration: InputDecoration(label: Text("Nombre")),
-      ),
-      TextField(
-        controller: passwordController,
-        decoration: InputDecoration(label: Text("Constraseña")),
-        obscureText: true,
-      ),
-      submmitButton(),
-      TextButton(
-        onPressed: () {
-          Navigator.pushNamed(context, '/login');
-        },
-        child: Text("Ya tienes cuenta? Inicia Sesion"),
-      )
-    ],
-  );
-
-  Widget submmitButton() => BlocBuilder<SignupBloc, SignupState>(
-    builder: (context, state) => ElevatedButton(
-      onPressed: () {
-        context.read<SignupBloc>().add(
-          SubmmitSignupEvent(
-            name: nameController.text,
-            email: emailController.text,
-            password: passwordController.text,
-          ),
-        );
-      },
-      child: Text("Crear usuario"),
-    ),
-  );
-
-  Widget dynamicContent() => BlocBuilder<SignupBloc, SignupState>(
-    builder: (context, state) {
-      if (state is SignupIdleState) {
-        return content();
-      } else if (state is SignupLoadingState) {
-        return CircularProgressIndicator();
-      } else if (state is SignupSuccessState) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          Navigator.pushReplacementNamed(context, '/profile');
-        });
-        return SizedBox.shrink();
-      } else {
-        return SizedBox.shrink();
-      }
-    },
-  );
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(body: SafeArea(child: dynamicContent()));
+    return Scaffold(
+      body: SafeArea(
+        child: SignupContent(
+          emailController: emailController,
+          passwordController: passwordController,
+          nameController: nameController,
+        ),
+      ),
+    );
   }
 }

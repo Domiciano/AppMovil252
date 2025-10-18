@@ -5,6 +5,8 @@ import 'package:moviles252/features/auth/ui/bloc/signup_bloc.dart';
 import 'package:moviles252/ui/screens/login_screen.dart';
 import 'package:moviles252/ui/screens/profile_screen.dart';
 import 'package:moviles252/features/auth/ui/screens/signup_screen.dart';
+import 'package:moviles252/features/chat/ui/bloc/chat_bloc.dart';
+import 'package:moviles252/features/chat/ui/screens/chat_screen.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -33,8 +35,11 @@ class MyApp extends StatelessWidget {
       routes: {
         '/signup': (_) =>
             BlocProvider(create: (_) => SignupBloc(), child: SignupScreen()),
-        '/login': (_) => BlocProvider(create: (_) => LoginBloc(), child: LoginScreen()),
+        '/login': (_) =>
+            BlocProvider(create: (_) => LoginBloc(), child: LoginScreen()),
         '/profile': (_) => ProfileScreen(),
+        '/chat': (_) =>
+            BlocProvider(create: (_) => ChatBloc(), child: const ChatScreen()),
       },
     );
   }

@@ -2,7 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:moviles252/features/auth/ui/bloc/login_bloc.dart';
 import 'package:moviles252/features/auth/ui/bloc/signup_bloc.dart';
+import 'package:moviles252/features/profiles/ui/bloc/profiles_list_bloc.dart';
+import 'package:moviles252/features/profiles/ui/screens/profiles_page.dart';
 import 'package:moviles252/ui/screens/login_screen.dart';
+import 'package:moviles252/ui/screens/my_profile_page.dart';
+import 'package:moviles252/ui/screens/post_page.dart';
 import 'package:moviles252/ui/screens/profile_screen.dart';
 import 'package:moviles252/features/auth/ui/screens/signup_screen.dart';
 import 'package:moviles252/features/chat/ui/bloc/chat_bloc.dart';
@@ -37,9 +41,18 @@ class MyApp extends StatelessWidget {
             BlocProvider(create: (_) => SignupBloc(), child: SignupScreen()),
         '/login': (_) =>
             BlocProvider(create: (_) => LoginBloc(), child: LoginScreen()),
-        '/profile': (_) => ProfileScreen(),
         '/chat': (_) =>
             BlocProvider(create: (_) => ChatBloc(), child: const ChatScreen()),
+        '/profile': (_) => ProfileScreen(
+          pages: [
+            MyProfilePage(),
+            PostPage(),
+            BlocProvider(
+              create: (context) => ProfilesListBloc(),
+              child: ProfilesPage(),
+            ),
+          ],
+        ),
       },
     );
   }

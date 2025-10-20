@@ -1,6 +1,5 @@
 import 'dart:async';
-
-import 'package:moviles252/features/chat/domain/model/message.dart';
+import 'package:moviles252/domain/model/message.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class MessageDataSource {
@@ -10,6 +9,7 @@ abstract class MessageDataSource {
     String content,
   );
   Future<List<Message>> getMessagesByConversation(String conversationId);
+  Stream<Message> listenMessagesByConversation(String conversationId);
 }
 
 class MessageDataSourceImpl extends MessageDataSource {
@@ -48,20 +48,10 @@ class MessageDataSourceImpl extends MessageDataSource {
     return (response as List).map((json) => Message.fromJson(json)).toList();
   }
 
+  @override
   Stream<Message> listenMessagesByConversation(String conversationId) {
     print("Listening messages ...");
     final controller = StreamController<Message>();
-    /*
-    var messages = await getMessagesByConversation(conversationId);
-    for (var m in messages) {
-      print(m);
-      yield m;
-    }
-
-    //MARATON
-    Supabase.instance.client.from('messages').stream(primaryKey: ['id']);
-    */
-
     final channel = Supabase.instance.client
         .channel('public:messages')
         .onPostgresChanges(

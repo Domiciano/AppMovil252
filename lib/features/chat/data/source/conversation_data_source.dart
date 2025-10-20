@@ -1,4 +1,4 @@
-import 'package:moviles252/features/chat/domain/model/conversation.dart';
+import 'package:moviles252/domain/model/conversation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 abstract class ConversationDataSource {

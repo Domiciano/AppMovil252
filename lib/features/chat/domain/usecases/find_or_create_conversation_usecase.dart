@@ -1,5 +1,5 @@
 import 'package:moviles252/features/chat/data/repository/conversation_repository_impl.dart';
-import 'package:moviles252/features/chat/domain/model/conversation.dart';
+import 'package:moviles252/domain/model/conversation.dart';
 import 'package:moviles252/features/chat/domain/repository/conversation_repository.dart';
 
 class FindOrCreateConversationUseCase {

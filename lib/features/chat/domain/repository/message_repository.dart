@@ -1,4 +1,4 @@
-import 'package:moviles252/features/chat/domain/model/message.dart';
+import 'package:moviles252/domain/model/message.dart';
 
 abstract class MessageRepository {
   Future<Message> sendMessage(
@@ -7,4 +7,5 @@ abstract class MessageRepository {
     String content,
   );
   Future<List<Message>> getMessagesByConversation(String conversationId);
+  Stream<Message> listenMessages(String conversationId);
 }

@@ -1,4 +1,4 @@
-import 'package:moviles252/features/chat/domain/model/conversation.dart';
+import 'package:moviles252/domain/model/conversation.dart';
 import 'package:moviles252/features/chat/domain/repository/conversation_repository.dart';
 import 'package:moviles252/features/chat/data/source/conversation_data_source.dart';
 

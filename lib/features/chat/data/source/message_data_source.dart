@@ -48,15 +48,19 @@ class MessageDataSourceImpl extends MessageDataSource {
     return (response as List).map((json) => Message.fromJson(json)).toList();
   }
 
-  Stream<Message> listenMessagesByConversation(String conversationId) async* {
+  Stream<Message> listenMessagesByConversation(String conversationId) {
     print("Listening messages ...");
     final controller = StreamController<Message>();
-
+    /*
     var messages = await getMessagesByConversation(conversationId);
     for (var m in messages) {
       print(m);
       yield m;
     }
+
+    //MARATON
+    Supabase.instance.client.from('messages').stream(primaryKey: ['id']);
+    */
 
     final channel = Supabase.instance.client
         .channel('public:messages')
@@ -73,6 +77,6 @@ class MessageDataSourceImpl extends MessageDataSource {
     controller.onCancel = () {
       Supabase.instance.client.removeChannel(channel);
     };
-    yield* controller.stream;
+    return controller.stream;
   }
 }

@@ -31,7 +31,6 @@ class _ChatScreenState extends State<ChatScreen> {
     final content = _messageController.text.trim();
     context.read<ChatBloc>().add(SendMessageEvent(content: content));
     _messageController.clear();
-    _scrollToBottom();
   }
 
   void _scrollToBottom() {
@@ -131,6 +130,7 @@ class _ChatScreenState extends State<ChatScreen> {
               ),
             );
           } else if (state is ChatLoadedState) {
+            _scrollToBottom();
             return Column(
               children: [
                 Expanded(
@@ -142,7 +142,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       final message = state.messages[index];
                       return MessageBubble(
                         message: message,
-                        isMe: message.senderId == state.currentUser.id,
+                        isMe: message.senderId == state.meId,
                       );
                     },
                   ),

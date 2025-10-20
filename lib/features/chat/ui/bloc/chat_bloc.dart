@@ -29,22 +29,29 @@ class ChatNewMessageArriveEvent extends ChatEvent {
 }
 
 // States
-abstract class ChatState {}
+abstract class ChatState {
+  final Conversation? conversation;
+  final String? meId;
+  final String? otherId;
+  final List<Message> messages;
+  ChatState({
+    this.messages = const [],
+    this.conversation,
+    this.meId,
+    this.otherId,
+  });
+}
 
 class ChatInitialState extends ChatState {}
 
 class ChatLoadingState extends ChatState {}
 
 class ChatLoadedState extends ChatState {
-  final List<Message> messages;
-  final Profile otherUser;
-  final Conversation conversation;
-  final Profile currentUser;
   ChatLoadedState({
-    required this.messages,
-    required this.otherUser,
-    required this.conversation,
-    required this.currentUser,
+    required super.messages,
+    super.conversation,
+    super.meId,
+    super.otherId,
   });
 }
 
@@ -68,6 +75,21 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   ChatBloc() : super(ChatInitialState()) {
     on<InitializeChatEvent>(_onInitializeChat);
     on<SendMessageEvent>(_onSendMessage);
+    on<ChatNewMessageArriveEvent>(_onMessageArrived);
+  }
+
+  void _onMessageArrived(
+    ChatNewMessageArriveEvent event,
+    Emitter<ChatState> emit,
+  ) {
+    emit(
+      ChatLoadedState(
+        messages: [...state.messages, event.message],
+        conversation: state.conversation,
+        meId: state.meId,
+        otherId: state.otherId,
+      ),
+    );
   }
 
   void _onInitializeChat(
@@ -77,10 +99,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     emit(ChatLoadingState());
     try {
       // Obtener usuario actual
-      final currentUser = await _whoAmIUseCase();
+      Profile? currentUser = await _whoAmIUseCase();
 
       // Obtener otro usuario actual
-      final otherUser = await repository.getProfileById(event.otherUser.id);
+      Profile? otherUser = await repository.getProfileById(event.otherUser.id);
 
       if (currentUser == null) {
         emit(ChatErrorState(message: 'No se pudo obtener el usuario actual'));
@@ -90,7 +112,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         emit(ChatErrorState(message: 'No se pudo obtener el otro usuario'));
         return;
       }
-      // Crear la conversación
+      // Cargar o Crear la conversación
       var conversation = await _findOrCreateConversationUseCase.excecute(
         currentUser.id,
         event.otherUser.id,
@@ -100,13 +122,14 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       emit(
         ChatLoadedState(
           messages: messages,
-          otherUser: otherUser,
           conversation: conversation,
-          currentUser: currentUser,
+          meId: currentUser.id,
+          otherId: otherUser.id,
         ),
       );
+      //Escuchar nuevos mensajes
       source.listenMessagesByConversation(conversation.id).listen((msg) {
-        print(msg.content);
+        add(ChatNewMessageArriveEvent(message: msg));
       });
     } catch (e) {
       emit(ChatErrorState(message: 'Error al cargar el chat: $e'));
@@ -114,13 +137,10 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   }
 
   void _onSendMessage(SendMessageEvent event, Emitter<ChatState> emit) async {
-    if (state is ChatLoadedState) {
-      var loadedState = state as ChatLoadedState;
-      sendMessageUseCase.execute(
-        loadedState.conversation.id,
-        loadedState.currentUser.id,
-        event.content,
-      );
-    }
+    sendMessageUseCase.execute(
+      state.conversation!.id,
+      state.meId!,
+      event.content,
+    );
   }
 }

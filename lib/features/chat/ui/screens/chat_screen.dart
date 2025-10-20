@@ -101,12 +101,6 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: BlocBuilder<ChatBloc, ChatState>(
         builder: (context, state) {
-          // Cargar el chat si no está cargado
-          if (state is ChatInitialState) {
-            context.read<ChatBloc>().add(
-              InitializeChatEvent(otherUser: otherUser),
-            );
-          }
           if (state is ChatLoadingState) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ChatErrorState) {

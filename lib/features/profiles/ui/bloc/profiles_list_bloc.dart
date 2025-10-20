@@ -30,8 +30,6 @@ class ProfilesListBloc extends Bloc<ProfilesListEvent, ProfilesListState> {
 
   ProfilesListBloc() : super(ProfilesListInitialState()) {
     on<LoadProfilesEvent>(_onLoadProfiles);
-    //Cargar desde el inicio
-    add(LoadProfilesEvent());
   }
 
   void _onLoadProfiles(

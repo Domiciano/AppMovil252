@@ -110,24 +110,9 @@ class _ChatScreenState extends State<ChatScreen> {
           if (state is ChatLoadingState) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ChatErrorState) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 64, color: Colors.red[300]),
-                  const SizedBox(height: 16),
-                  Text(
-                    'Error al cargar el chat',
-                    style: Theme.of(context).textTheme.headlineSmall,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    state.message,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
+            return Text(
+              'Error al cargar el chat',
+              style: Theme.of(context).textTheme.headlineSmall,
             );
           } else if (state is ChatLoadedState) {
             _scrollToBottom();
@@ -137,13 +122,16 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: ListView.builder(
                     controller: _scrollController,
                     padding: const EdgeInsets.all(16),
-                    itemCount: state.messages.length,
+                    itemCount: 0,
                     itemBuilder: (context, index) {
-                      final message = state.messages[index];
-                      return MessageBubble(
-                        message: message,
-                        isMe: message.senderId == state.meId,
+                      final message = Message(
+                        id: "",
+                        conversationId: "",
+                        senderId: "",
+                        content: "Hola mundo",
+                        createdAt: DateTime.now(),
                       );
+                      return MessageBubble(message: message, isMe: true);
                     },
                   ),
                 ),

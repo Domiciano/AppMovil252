@@ -22,14 +22,14 @@ class ProfilesPage extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             itemCount: state.profiles.length,
             itemBuilder: (context, index) {
-              final profile = state.profiles[index];
+              final clickedProfile = state.profiles[index];
               return ProfileCard(
-                profile: profile,
+                profile: clickedProfile,
                 onTap: () {
                   Navigator.pushNamed(
                     context,
                     '/chat',
-                    arguments: {"otherUser": profile},
+                    arguments: {"otherUser": clickedProfile},
                   );
                 },
               );

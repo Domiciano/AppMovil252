@@ -29,13 +29,31 @@ class ChatNewMessageArriveEvent extends ChatEvent {
 }
 
 // States
-abstract class ChatState {}
+abstract class ChatState {
+  final List<Message> messages;
+  final String? meId;
+  final String? otherId;
+  final String? conversation;
+  ChatState({
+    this.messages = const [],
+    this.meId,
+    this.otherId,
+    this.conversation,
+  });
+}
 
 class ChatInitialState extends ChatState {}
 
 class ChatLoadingState extends ChatState {}
 
-class ChatLoadedState extends ChatState {}
+class ChatLoadedState extends ChatState {
+  ChatLoadedState({
+    super.messages,
+    super.meId,
+    super.otherId,
+    super.conversation,
+  });
+}
 
 class ChatErrorState extends ChatState {
   final String message;
@@ -44,6 +62,12 @@ class ChatErrorState extends ChatState {
 
 // Bloc
 class ChatBloc extends Bloc<ChatEvent, ChatState> {
+  final WhoAmIUseCase _whoAmIUseCase = WhoAmIUseCase();
+  final FindOrCreateConversationUseCase _findOrCreateConversationUseCase =
+      FindOrCreateConversationUseCase();
+  final GetMessagesUseCase _getMessagesUseCase = GetMessagesUseCase();
+  final SendMessageUseCase _sendMessageUseCase = SendMessageUseCase();
+
   ChatBloc() : super(ChatInitialState()) {
     on<InitializeChatEvent>(_onInitializeChat);
     on<SendMessageEvent>(_onSendMessage);
@@ -61,10 +85,33 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     InitializeChatEvent event,
     Emitter<ChatState> emit,
   ) async {
-    throw Exception();
+    emit(ChatLoadingState());
+    var me = await _whoAmIUseCase.call();
+    if (me == null) {
+      print("Current user no existe");
+      return;
+    }
+    Conversation conversation = await _findOrCreateConversationUseCase.excecute(
+      me.id,
+      event.otherUser.id,
+    );
+    print(conversation);
+    var messages = await _getMessagesUseCase.execute(conversation.id);
+    emit(
+      ChatLoadedState(
+        messages: messages,
+        meId: me.id,
+        otherId: event.otherUser.id,
+        conversation: conversation.id,
+      ),
+    );
   }
 
   void _onSendMessage(SendMessageEvent event, Emitter<ChatState> emit) async {
-    throw Exception();
+    _sendMessageUseCase.execute(
+      state.conversation!,
+      state.meId!,
+      event.content,
+    );
   }
 }

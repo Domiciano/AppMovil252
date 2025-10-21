@@ -16,7 +16,12 @@ class ProfileDataSourceImpl extends ProfileDataSource {
 
   @override
   Future<List<Profile>> getAllProfiles() async {
-    throw Exception();
+    var response = await Supabase.instance.client
+        .from("profiles")
+        .select()
+        .order("created_at", ascending: false);
+    var list = response.map((json) => Profile.fromJson(json)).toList();
+    return list;
   }
 
   @override

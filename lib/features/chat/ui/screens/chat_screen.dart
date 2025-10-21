@@ -101,7 +101,12 @@ class _ChatScreenState extends State<ChatScreen> {
       ),
       body: BlocBuilder<ChatBloc, ChatState>(
         builder: (context, state) {
-          if (state is ChatLoadingState) {
+          if (state is ChatInitialState) {
+            print("Inicializando chat");
+            context.read<ChatBloc>().add(
+              InitializeChatEvent(otherUser: otherUser),
+            );
+          } else if (state is ChatLoadingState) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is ChatErrorState) {
             return Text(
@@ -116,16 +121,13 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: ListView.builder(
                     controller: _scrollController,
                     padding: const EdgeInsets.all(16),
-                    itemCount: 0,
+                    itemCount: state.messages.length,
                     itemBuilder: (context, index) {
-                      final message = Message(
-                        id: "",
-                        conversationId: "",
-                        senderId: "",
-                        content: "Hola mundo",
-                        createdAt: DateTime.now(),
+                      final message = state.messages[index];
+                      return MessageBubble(
+                        message: message,
+                        isMe: message.senderId == state.meId,
                       );
-                      return MessageBubble(message: message, isMe: true);
                     },
                   ),
                 ),

@@ -37,7 +37,6 @@ class ProfilesListBloc extends Bloc<ProfilesListEvent, ProfilesListState> {
     Emitter<ProfilesListState> emit,
   ) async {
     emit(ProfilesListLoadingState());
-
     try {
       final profiles = await _getAllProfilesUseCase.excecute();
       emit(ProfilesListLoadedState(profiles: profiles));

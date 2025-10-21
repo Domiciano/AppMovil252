@@ -19,16 +19,48 @@ class MessageDataSourceImpl extends MessageDataSource {
     String senderId,
     String content,
   ) async {
-    throw Exception();
+    var message = await Supabase.instance.client
+        .from("messages")
+        .insert({
+          "conversation_id": conversationId,
+          "sender_id": senderId,
+          "content": content,
+        })
+        .select()
+        .single();
+    return Message.fromJson(message);
   }
 
   @override
   Future<List<Message>> getMessagesByConversation(String conversationId) async {
-    throw Exception();
+    var list = await Supabase.instance.client
+        .from("messages")
+        .select()
+        .eq("conversation_id", conversationId)
+        .order("created_at", ascending: true);
+    return list.map((json) => Message.fromJson(json)).toList();
   }
 
   @override
   Stream<Message> listenMessagesByConversation(String conversationId) {
-    throw Exception();
+    print("Listening messages ...");
+    final controller = StreamController<Message>();
+    final channel = Supabase.instance.client
+        .channel('public:messages')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'messages',
+          callback: (payload) {
+            controller.add(Message.fromJson(payload.newRecord));
+            print("++++++++++++++++");
+            print(payload.newRecord);
+          },
+        )
+        .subscribe();
+    controller.onCancel = () {
+      Supabase.instance.client.removeChannel(channel);
+    };
+    return controller.stream;
   }
 }

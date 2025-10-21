@@ -13,7 +13,11 @@ class ProfilesPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ProfilesListBloc, ProfilesListState>(
       builder: (context, state) {
-        if (state is ProfilesListLoadingState) {
+        if (state is ProfilesListInitialState) {
+          context.read<ProfilesListBloc>().add(
+            LoadProfilesEvent(),
+          ); //Carga inicial de datos
+        } else if (state is ProfilesListLoadingState) {
           return CircularProgressIndicator();
         } else if (state is ProfilesListErrorState) {
           return Text('Error al cargar perfiles');

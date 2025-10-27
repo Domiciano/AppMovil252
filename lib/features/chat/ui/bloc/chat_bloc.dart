@@ -67,6 +67,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       FindOrCreateConversationUseCase();
   final GetMessagesUseCase _getMessagesUseCase = GetMessagesUseCase();
   final SendMessageUseCase _sendMessageUseCase = SendMessageUseCase();
+  final ListenMessagesUsecase _listenMessagesUsecase = ListenMessagesUsecase();
 
   ChatBloc() : super(ChatInitialState()) {
     on<InitializeChatEvent>(_onInitializeChat);
@@ -78,7 +79,15 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
     ChatNewMessageArriveEvent event,
     Emitter<ChatState> emit,
   ) {
-    throw Exception();
+    var currentState = state;
+    emit(
+      ChatLoadedState(
+        messages: [...currentState.messages, event.message],
+        meId: currentState.meId,
+        otherId: currentState.otherId,
+        conversation: currentState.conversation,
+      ),
+    );
   }
 
   void _onInitializeChat(
@@ -105,6 +114,11 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
         conversation: conversation.id,
       ),
     );
+    //Listen to new messages
+    Stream<Message> stream = _listenMessagesUsecase.excecute(conversation.id);
+    stream.listen((data) {
+      add(ChatNewMessageArriveEvent(message: data));
+    });
   }
 
   void _onSendMessage(SendMessageEvent event, Emitter<ChatState> emit) async {

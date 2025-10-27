@@ -51,6 +51,11 @@ class MessageDataSourceImpl extends MessageDataSource {
           event: PostgresChangeEvent.all,
           schema: 'public',
           table: 'messages',
+          filter: PostgresChangeFilter(
+            type: PostgresChangeFilterType.eq,
+            column: "conversation_id",
+            value: conversationId,
+          ),
           callback: (payload) {
             controller.add(Message.fromJson(payload.newRecord));
             print("++++++++++++++++");

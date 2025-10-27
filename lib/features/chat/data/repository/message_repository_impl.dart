@@ -25,6 +25,6 @@ class MessageRepositoryImpl implements MessageRepository {
 
   @override
   Stream<Message> listenMessages(String conversationId) {
-    throw Exception();
+    return _messageDataSource.listenMessagesByConversation(conversationId);
   }
 }

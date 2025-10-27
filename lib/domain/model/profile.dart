@@ -2,12 +2,14 @@ class Profile {
   String id; // UID de Supabase Auth
   final String name;
   final String email;
+  final String photoUrl;
   final DateTime createdAt;
 
   Profile({
     required this.id,
     required this.name,
     required this.email,
+    required this.photoUrl,
     required this.createdAt,
   });
 
@@ -17,6 +19,7 @@ class Profile {
       'id': id,
       'name': name,
       'email': email,
+      'photo_url': email,
       'created_at': createdAt.toIso8601String(),
     };
   }
@@ -27,6 +30,7 @@ class Profile {
       id: json['id'] as String,
       name: json['name'] as String,
       email: json['email'] as String,
+      photoUrl: json['photo_url'] as String,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
   }

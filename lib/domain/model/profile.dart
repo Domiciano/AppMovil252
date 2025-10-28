@@ -2,14 +2,14 @@ class Profile {
   String id; // UID de Supabase Auth
   final String name;
   final String email;
-  final String photoUrl;
+  final String? photoUrl;
   final DateTime createdAt;
 
   Profile({
     required this.id,
     required this.name,
     required this.email,
-    required this.photoUrl,
+    this.photoUrl,
     required this.createdAt,
   });
 

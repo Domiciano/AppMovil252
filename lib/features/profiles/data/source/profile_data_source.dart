@@ -20,6 +20,7 @@ class ProfileDataSourceImpl extends ProfileDataSource {
         .from("profiles")
         .select()
         .order("created_at", ascending: false);
+    print(response);
     var list = response.map((json) => Profile.fromJson(json)).toList();
     return list;
   }

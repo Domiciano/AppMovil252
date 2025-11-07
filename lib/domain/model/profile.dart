@@ -30,7 +30,7 @@ class Profile {
       id: json['id'] as String,
       name: json['name'] as String,
       email: json['email'] as String,
-      photoUrl: json['photo_url'] as String,
+      photoUrl: json['photo_url'] as String?,
       createdAt: DateTime.parse(json['created_at'] as String),
     );
   }

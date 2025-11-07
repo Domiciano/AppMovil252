@@ -20,7 +20,7 @@ class ProfilesPage extends StatelessWidget {
         } else if (state is ProfilesListLoadingState) {
           return CircularProgressIndicator();
         } else if (state is ProfilesListErrorState) {
-          return Text('Error al cargar perfiles');
+          return Text('Error al cargar perfiles: ${state.message}');
         } else if (state is ProfilesListLoadedState) {
           return ListView.builder(
             padding: const EdgeInsets.all(16),

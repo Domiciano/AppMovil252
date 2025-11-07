@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "861116869551",
+    "project_id": "flutterdomibaas",
+    "storage_bucket": "flutterdomibaas.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:861116869551:android:a81c8b5f87acaaa5489d5a",
+        "android_client_info": {
+          "package_name": "edu.co.icesi.moviles252"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHYKXdbFbYymU_hg2KV9KDkooOdQAn4C0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

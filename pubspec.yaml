@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   image_picker: ^1.2.0
   uuid: ^4.4.2
+  google_maps_flutter: ^2.9.0
 
 
 dev_dependencies:

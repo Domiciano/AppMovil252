@@ -5,6 +5,7 @@ import 'package:moviles252/features/auth/ui/bloc/signup_bloc.dart';
 import 'package:moviles252/features/profiles/ui/bloc/profiles_list_bloc.dart';
 import 'package:moviles252/features/profiles/ui/screens/profiles_page.dart';
 import 'package:moviles252/ui/screens/login_screen.dart';
+import 'package:moviles252/ui/screens/map_screen.dart';
 import 'package:moviles252/ui/screens/my_profile_page.dart';
 import 'package:moviles252/ui/screens/post_page.dart';
 import 'package:moviles252/ui/screens/profile_screen.dart';
@@ -35,8 +36,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      initialRoute: '/login',
+      initialRoute: '/map',
       routes: {
+        '/map': (_) => MapScreen(),
         '/signup': (_) =>
             BlocProvider(create: (_) => SignupBloc(), child: SignupScreen()),
         '/login': (_) =>

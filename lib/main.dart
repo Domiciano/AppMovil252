@@ -35,9 +35,12 @@ void main() async {
   // Configura canal local
   const AndroidInitializationSettings initSettingsAndroid =
       AndroidInitializationSettings('@mipmap/ic_launcher');
-  const InitializationSettings initSettings =
-      InitializationSettings(android: initSettingsAndroid);
+  const InitializationSettings initSettings = InitializationSettings(
+    android: initSettingsAndroid,
+  );
   await flutterLocalNotificationsPlugin.initialize(initSettings);
+
+  await registerAndroidChannel();
 
   await Supabase.initialize(
     url: 'https://yzosfzyewkdpnmlbgbej.supabase.co',
@@ -47,20 +50,34 @@ void main() async {
   runApp(const App());
 }
 
+Future<void> registerAndroidChannel() async {
+  // Crear canal de notificaciones de alta prioridad
+  const AndroidNotificationChannel channel = AndroidNotificationChannel(
+    'canal_importante',
+    'Notificaciones importantes',
+    description: 'Canal para notificaciones heads-up',
+    importance: Importance.high,
+    playSound: true,
+  );
 
-class App extends StatefulWidget{
+  // Registrar canal en Android
+  await flutterLocalNotificationsPlugin
+      .resolvePlatformSpecificImplementation<
+        AndroidFlutterLocalNotificationsPlugin
+      >()
+      ?.createNotificationChannel(channel);
+}
+
+class App extends StatefulWidget {
   const App({super.key});
 
   @override
   State<StatefulWidget> createState() {
     return MyAppState();
   }
-  
 }
 
-
 class MyAppState extends State<App> {
-
   int id = 0;
 
   @override
@@ -99,7 +116,6 @@ class MyAppState extends State<App> {
     );
   }
 
-
   Future<void> _initNotifications() async {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
 
@@ -122,27 +138,20 @@ class MyAppState extends State<App> {
 
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
-      
-        flutterLocalNotificationsPlugin.show(
-          id++,
-          "Nuevo mensaje",
-          "${message.data}",
-          const NotificationDetails(
-            android: AndroidNotificationDetails(
-              'canal_notif', // ID único del canal
-              'Notificaciones generales',
-              importance: Importance.max,
-              priority: Priority.high,
-            ),
-          ),
-        );
-      
-    });
 
-    // 🔙 Cuando la app fue abierta desde una notificación
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      print('🔓 Notificación abrió la app: ${message.data}');
+      flutterLocalNotificationsPlugin.show(
+        id++,
+        "Nuevo mensaje",
+        "${message.data}",
+        const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'canal_notif', // ID único del canal
+            'Notificaciones generales',
+            importance: Importance.max,
+            priority: Priority.high,
+          ),
+        ),
+      );
     });
   }
-
 }
